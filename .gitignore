@@ -1,0 +1,26 @@
+
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# generated data & model artifacts (large, reproducible from raw videos)
+data/raw_videos/
+data/background_removed/
+data/motion_images/
+data/augmented_images/
+data/*.csv
+data/*.jpg
+models/*.h5
+models/*.keras
+models/label_map.json
+
+.vscode/
+.idea/
+
+# original thesis notebooks / docx / raw label files: kept locally, not uploaded
+legacy/
