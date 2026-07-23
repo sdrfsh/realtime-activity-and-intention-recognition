@@ -32,3 +32,11 @@ See [Setup](docs/SETUP.md) and [Usage](docs/USAGE.md) for the full walkthrough.
 ## 🏷️ Labels are yours to define
 
 Class labels aren't hardcoded — whatever label strings appear in your `labeled_data.csv` become the classes the model learns and reports by name. `entering` / `passing_by` is just the reference scenario used throughout this repo's tests and demos.
+
+## 📄 Research paper
+
+This repo implements the method from:
+
+> Sahar Darafsh, Saeed Shiry Ghidary, Morteza Saheb Zamani, **"Real-Time Activity Recognition and Intention Recognition Using a Vision-based Embedded System"**, [arXiv:2107.12744](https://arxiv.org/abs/2107.12744)
+
+98.78% accuracy on the intention-recognition dataset, plus 78.48% on HMDB-51, 97.95% on KTH, and 100% on Weizmann — with a real-time embedded implementation (333 MHz Xilinx ZCU102, 120 fps).
