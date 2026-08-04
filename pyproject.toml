@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Real-time embedded human activity recognition via adaptive motion-image encoding and a shallow AlexNet."
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
 dependencies = [
     "numpy",
     "opencv-python",
