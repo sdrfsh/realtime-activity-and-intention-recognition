@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from config import SceneSettings
-from preprocessing.door_approach_decider import DoorApproachDecider
+from modeling.door_approach_decider import DoorApproachDecider
 
 H, W = 90, 160
 

@@ -2,7 +2,7 @@
 
 A layered Python service that watches a video feed near an automatic door and figures out someone's **intention**: are they 🚶‍♂️ **entering** (heading through the door), or just 🔀 **passing by**?
 
-It works by compressing a video clip into a single still image that encodes both the *shape* and *speed* of motion, then classifying that image with a shallow convolutional network light enough to run embedded — right next to the door, not in the cloud. The same pipeline generalizes to other single-subject activity recognition tasks, but the door use case is what it's built and demonstrated for.
+It works by compressing a video clip into a single still image that encodes both the *shape* and *speed* of motion, then classifying that image with a shallow convolutional network light enough to run embedded — right next to the door, not in the cloud. The live camera path can also decide straight from the tracked subject's heading toward a configured door edge, with no model at all. The same pipeline generalizes to other single-subject activity recognition tasks, but the door use case is what it's built and demonstrated for.
 
 ## 📖 Documentation
 

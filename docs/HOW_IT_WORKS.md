@@ -30,7 +30,7 @@ A shallow **AlexNet** (5 convolutional + 3 fully connected layers) with Tanh act
 Trained with SGD (tuned learning rate/momentum, favoring generalization over convergence speed) on a **60/30/10** train/validation/test split.
 
 ### 6. ⚡ Real-time inference
-The same tracking → sampling → encoding pipeline runs end-to-end on a single freshly captured clip and feeds the trained model, returning the recognized intention by name — e.g. `"entering"` with a confidence score — for real-time/embedded use, such as triggering the door.
+Live, the camera feed is tracked continuously; motion opens a fixed-length window and one decision is made per window. By default that decision is read directly off the tracked subject's heading: moving toward the configured door edge is `entering`, anything else `passing_by` (see [Usage](USAGE.md#-where-the-door-is-and-how-a-decision-is-made)). Alternatively the window's motion image goes through the same sampling → encoding pipeline and is classified by the trained model. Either way the result is a label with a confidence, ready to trigger the door.
 
 ## 🏷️ About the class labels
 

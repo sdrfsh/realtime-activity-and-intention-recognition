@@ -1,14 +1,18 @@
 """Measure frozen-model and optical-flow inference costs on the target box."""
 from __future__ import annotations
 
+import sys
 import time
+from pathlib import Path
 
-import numpy as np
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from config import load_settings
-from modeling.activity_predictor import ActivityPredictor
-from modeling.network_input_formatter import NetworkInputFormatter
-from preprocessing.optical_flow_estimator import OpticalFlowEstimator
+import numpy as np  # noqa: E402
+
+from config import load_settings  # noqa: E402
+from modeling.activity_predictor import ActivityPredictor  # noqa: E402
+from modeling.network_input_formatter import NetworkInputFormatter  # noqa: E402
+from preprocessing.optical_flow_estimator import OpticalFlowEstimator  # noqa: E402
 
 
 def percentile(values: list[float], value: float) -> float:

@@ -26,6 +26,12 @@ python examples/visualize_pipeline.py data/raw_videos/clip.mp4 data/contact_shee
 
 Useful for sanity-checking `AdaptiveFrameSampler` and `MotionImageEncoder` against an actual clip.
 
+`profile_predict.py` times one network prediction and one optical-flow call on the current machine (downloads the pretrained model on first run):
+
+```bash
+python examples/profile_predict.py
+```
+
 ## ⚠️ A note on `run_door_demo.py`'s accuracy
 
 The demo proves the **pipeline** end to end — tracking, adaptive sampling, motion-image encoding, augmentation, training, and inference all run without error, and predictions come back as real label names (`"entering"`, not `"class 0"`).

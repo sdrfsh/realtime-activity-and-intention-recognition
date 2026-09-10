@@ -25,16 +25,15 @@ from domain.entities import LiveDecision, PredictionResult
 from modeling.activity_predictor import ActivityPredictor
 from modeling.alexnet_builder import AlexNetBuilder
 from modeling.dataset_splitter import DatasetSplitter
+from modeling.door_approach_decider import DoorApproachDecider
 from modeling.model_source import is_hub_source
 from modeling.model_trainer import ModelTrainer
-from modeling.network_input_formatter import NetworkInputFormatter
 from pipelines.clip_preprocessing_pipeline import ClipPreprocessingPipeline
 from pipelines.dataset_preparation_pipeline import DatasetPreparationPipeline
 from pipelines.live_session import LiveSession
 from pipelines.training_pipeline import TrainingPipeline
 from preprocessing.adaptive_frame_sampler import AdaptiveFrameSampler
 from preprocessing.background_subtractor import BackgroundSubtractor
-from preprocessing.door_approach_decider import DoorApproachDecider
 from preprocessing.mask_cleaner import MaskCleaner
 from preprocessing.motion_contour_detector import MotionContourDetector
 from preprocessing.motion_image_encoder import MotionImageEncoder
