@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md)
 
-`examples/` has small utilities (demo/debug aids, not part of the package) for exercising the full OpenCV/Keras pipeline without needing real door footage — they render a moving square whose trajectory either heads into a marked door zone (`entering`) or passes alongside it (`passing_by`).
+`examples/` has small utilities (demo/debug aids, not part of the package) for exercising the full OpenCV/Keras pipeline without needing real door footage. They render a moving square whose trajectory either heads into a marked door zone (`entering`) or passes alongside it (`passing_by`).
 
 ## ▶️ One-shot demo
 
@@ -34,7 +34,7 @@ python examples/profile_predict.py
 
 ## ⚠️ A note on `run_door_demo.py`'s accuracy
 
-The demo proves the **pipeline** end to end — tracking, adaptive sampling, motion-image encoding, augmentation, training, and inference all run without error, and predictions come back as real label names (`"entering"`, not `"class 0"`).
+The demo proves the **pipeline** end to end: tracking, adaptive sampling, motion-image encoding, augmentation, training, and inference all run without error, and predictions come back as real label names (`"entering"`, not `"class 0"`).
 
 Whether the prediction is *correct* on this demo isn't meaningful to read into: AlexNet has ~28M parameters and expects real datasets of hundreds of clips per class (the reference methodology this repo implements was validated on 738 real clips). Training it on 2 synthetic clips is expected to overfit and swing unpredictably between epochs and runs.
 

@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md)
 
-Run from the project root — no install required, since running a script directly puts `src/` on the import path automatically.
+Run from the project root. No install is required, since running a script directly puts `src/` on the import path automatically.
 
 ```bash
 # 1. raw labeled clips -> augmented motion-image dataset
