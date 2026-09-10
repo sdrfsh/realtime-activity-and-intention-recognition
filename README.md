@@ -14,6 +14,7 @@ It works by compressing a video clip into a single still image that encodes both
 | 🚀 [Usage](docs/USAGE.md) | CLI commands for preparing data, training, and predicting |
 | ✅ [Testing](docs/TESTING.md) | Running the fast, no-GPU unit test suite |
 | 🎥 [Demo Without a Camera](docs/DEMO.md) | Try the full pipeline with synthetic clips — no door footage needed |
+| 🤗 [Pretrained model](https://huggingface.co/sdrfsh/alexnet-door-entry-classifier) | Trained weights for the door entering/passing-by scenario, ready to download |
 
 ## ⚡ Quick start
 
@@ -31,10 +32,23 @@ python src/__main__.py live --camera 0 --window 3.0
 # which edge of the image the door is on (default: right); heading there = entering
 python src/__main__.py live --camera 0 --door-side top
 ```
+## 🤗 Pretrained model
 
-`predict` is retained as a development and regression tool. Product inference
-uses the continuous `live` camera path.
+A trained AlexNet classifier for the reference scenario (`entering` vs `passing_by`) is available on Hugging Face:
 
+[![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-alexnet--door--entry--classifier-yellow)](https://huggingface.co/sdrfsh/alexnet-door-entry-classifier)
+
+- **98.84% test accuracy** on a balanced held-out set (1,120 images)
+- Input: 227x227x3 motion-encoded images, raw 0-255 pixels (rescaling is built in)
+- Keras `.keras` format; can also be [fine-tuned for other activity-recognition datasets](https://huggingface.co/sdrfsh/alexnet-door-entry-classifier#fine-tuning-for-other-activity-recognition-tasks)
+
+```python
+import keras
+from huggingface_hub import hf_hub_download
+
+path = hf_hub_download("sdrfsh/alexnet-door-entry-classifier", "alexnet.keras")
+model = keras.models.load_model(path)
+```
 See [Setup](docs/SETUP.md) and [Usage](docs/USAGE.md) for the full walkthrough.
 
 ## 🏷️ Labels are yours to define
