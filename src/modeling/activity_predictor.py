@@ -6,31 +6,41 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import keras
 import numpy as np
-from tensorflow.keras.models import load_model
 
 from config import NetworkSettings
-from data.label_map_repository import LabelMapRepository
 from domain.entities import PredictionResult
+from modeling.model_source import resolve_model_source
 
 
 class ActivityPredictor:
-    """Single job: turn one motion image into a predicted class label."""
+    """Single job: turn one motion image into a predicted class label.
+
+    ``model_source`` is a local ``.keras`` path or an ``hf://namespace/repo``
+    reference; ``classes`` lists the label names in output-index order.
+    """
 
     def __init__(
         self,
         settings: NetworkSettings,
-        model_path: Path,
-        label_map_repository: LabelMapRepository,
+        model_source: str | Path,
+        classes: list[str] | tuple[str, ...],
     ) -> None:
         self._settings = settings
-        self._model = load_model(str(model_path))
-        self._classes = label_map_repository.load()
+        model_path = resolve_model_source(model_source, settings.model_filename)
+        self._model = keras.saving.load_model(model_path, compile=False)
+        self._classes = list(classes)
+
+    @property
+    def classes(self) -> list[str]:
+        """Label names in output-index order."""
+        return list(self._classes)
 
     def predict(self, motion_image: np.ndarray) -> PredictionResult:
         height, width, _ = self._settings.input_shape
         batch = motion_image.reshape(1, height, width, -1).astype(np.float32)
-        probabilities = self._model.predict(batch)[0]
+        probabilities = np.asarray(self._model.predict(batch, verbose=0))[0]
         label_index = int(np.argmax(probabilities))
         label = self._classes[label_index] if label_index < len(self._classes) else str(label_index)
         return PredictionResult(

@@ -13,7 +13,9 @@ dependencies = [
     "numpy",
     "opencv-python",
     "pandas",
-    "tensorflow",
+    "keras>=3",
+    "jax",
+    "huggingface_hub",
 ]
 
 [project.optional-dependencies]

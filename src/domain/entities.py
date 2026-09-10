@@ -16,14 +16,6 @@ class LabeledClip:
 
 
 @dataclass(frozen=True)
-class SampledFrames:
-    """The frames selected from a clip by the adaptive sampler, plus the rate used."""
-
-    frames: list[np.ndarray]
-    sampling_rate: int
-
-
-@dataclass(frozen=True)
 class MotionImage:
     """The single recency-weighted image produced for one clip (the "dynamic image")."""
 
@@ -46,3 +38,28 @@ class PredictionResult:
     label_index: int
     label: str
     class_probabilities: np.ndarray
+
+
+@dataclass(frozen=True)
+class DoorApproach:
+    """Heading-based verdict for one window: where the subject's centroid
+    started and ended (0..1 frame fractions), how far it moved toward and
+    along the door edge, and the resulting label."""
+
+    label: str
+    entering_score: float
+    start: tuple[float, float]
+    end: tuple[float, float]
+    toward_door: float
+    across_door: float
+    trajectory: list[tuple[float, float]]
+
+
+@dataclass(frozen=True)
+class LiveDecision:
+    label: str
+    confidence: float
+    class_probabilities: np.ndarray
+    started_at: float
+    decided_at: float
+    latency_s: float

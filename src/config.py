@@ -66,6 +66,28 @@ class TrackingSettings:
     canny_thresholds: tuple[int, int] = (5, 255)
     video_fps: int = 28
     video_fourcc: str = "MP4V"
+    # KNN background model. ``knn_dist2_threshold`` is the squared intensity
+    # distance a pixel must move before it counts as foreground (OpenCV default
+    # 400); raising it suppresses sensor noise and small exposure drift.
+    # ``knn_history`` is how many frames a still object takes to be absorbed
+    # into the background (OpenCV default 500 = ~17 s at 30 fps).
+    knn_history: int = 500
+    knn_dist2_threshold: float = 800.0
+    # Mask cleanup after subtraction (all at ``frame_size`` resolution), in
+    # order: median blur kills isolated specks; opening removes thin noise;
+    # closing (``mask_close_kernel`` px) fills holes inside the silhouette;
+    # components below ``mask_min_component_area`` px are dropped. The last
+    # two stages grow the blob and are off by default: ``mask_dilate_iterations``
+    # expands survivors, and ``mask_fill_mode`` paints each blob's convex
+    # hull ("hull"), fills only its interior holes ("contour"), or does
+    # nothing ("none").
+    mask_median_kernel: int = 5
+    mask_open_iterations: int = 1
+    mask_close_kernel: int = 5
+    mask_close_iterations: int = 2
+    mask_min_component_area: int = 30
+    mask_dilate_iterations: int = 0
+    mask_fill_mode: str = "none"
 
 
 @dataclass(frozen=True)
@@ -96,6 +118,14 @@ class NetworkSettings:
 
     input_shape: tuple[int, int, int] = (227, 227, 3)
     num_classes: int = 2
+    # Inference model: a local ``.keras`` path or ``hf://namespace/repo[/file]``.
+    # Defaults to the published pretrained classifier; ``train`` writes its
+    # own model to ``PathSettings.trained_model_path`` and ``--model`` selects it.
+    model_source: str = "hf://sdrfsh/alexnet-door-entry-classifier"
+    model_filename: str = "alexnet.keras"
+    # Output-index order of the pretrained Hub model (0 = passing by, 1 = entering).
+    # Locally trained models carry their own order in ``label_map.json``.
+    pretrained_classes: tuple[str, ...] = ("passing_by", "entering")
     hidden_activation: str = "tanh"
     output_activation: str = "softmax"
     kernel_initializer: str = "glorot_normal"
@@ -108,12 +138,75 @@ class NetworkSettings:
     test_ratio: float = 0.1
 
 
+DOOR_SIDES: tuple[str, ...] = ("right", "left", "top", "bottom")
+
+
+@dataclass(frozen=True)
+class SceneSettings:
+    """Where the door sits in the camera image and how a door approach is
+    recognised from the subject's heading (``DoorApproachDecider``).
+
+    Purely 2-D: the door is one of the four frame edges and depth along the
+    camera axis is not modelled. The subject's centroid is tracked across the
+    window; if it travels at least ``approach_min_travel`` (a fraction of the
+    frame size) toward ``door_side``, with a heading within
+    ``approach_max_angle_deg`` of that edge's normal, the decision is
+    "entering", otherwise "passing_by". ``trajectory_smoothing_frames``
+    centroids are averaged at each end of the window to suppress mask jitter.
+    Masks with fewer than ``min_foreground_pixels`` are ignored, as are masks
+    where more than ``max_foreground_fraction`` of the frame is foreground
+    (the background model has not settled, or the exposure just jumped).
+    """
+
+    door_side: str = "right"
+    approach_min_travel: float = 0.10
+    approach_max_angle_deg: float = 60.0
+    trajectory_smoothing_frames: int = 3
+    min_foreground_pixels: int = 30
+    max_foreground_fraction: float = 0.5
+
+    def __post_init__(self) -> None:
+        if self.door_side not in DOOR_SIDES:
+            raise ValueError(f"door_side must be one of {DOOR_SIDES}, got {self.door_side!r}")
+        if not 0.0 < self.approach_max_angle_deg < 180.0:
+            raise ValueError("approach_max_angle_deg must be between 0 and 180 (exclusive)")
+
+
+DECISION_MODES: tuple[str, ...] = ("heading", "network")
+
+
+@dataclass(frozen=True)
+class LiveSettings:
+    camera_source: int | str = 0
+    window_seconds: float = 3.0
+    warmup_seconds: float = 3.0
+    cooldown_seconds: float = 2.5
+    # Foreground pixels (of 160x90 = 14,400) needed to start a window. A quiet
+    # webcam scene still shows ~400-800 from sensor noise, and auto-exposure
+    # swings reach several thousand, so this demands ~14% of the frame to
+    # change; lower it for a fixed, exposure-locked camera.
+    motion_pixel_threshold: int = 2000
+    fps_probe_frames: int = 60
+    queue_max_frames: int = 30
+    preview: bool = True
+    # "heading": decide from the tracked subject's direction relative to
+    # ``SceneSettings.door_side``. "network": classify the motion image with
+    # the AlexNet model (ignores the door side).
+    decision_mode: str = "heading"
+
+    def __post_init__(self) -> None:
+        if self.decision_mode not in DECISION_MODES:
+            raise ValueError(f"decision_mode must be one of {DECISION_MODES}, got {self.decision_mode!r}")
+
+
 @dataclass(frozen=True)
 class Settings:
     paths: PathSettings = field(default_factory=PathSettings)
     tracking: TrackingSettings = field(default_factory=TrackingSettings)
     sampling: SamplingSettings = field(default_factory=SamplingSettings)
     network: NetworkSettings = field(default_factory=NetworkSettings)
+    scene: SceneSettings = field(default_factory=SceneSettings)
+    live: LiveSettings = field(default_factory=LiveSettings)
 
 
 def load_settings() -> Settings:

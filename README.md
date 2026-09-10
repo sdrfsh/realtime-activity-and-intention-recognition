@@ -25,7 +25,15 @@ python src/__main__.py prepare-dataset
 python src/__main__.py train
 python src/__main__.py predict path/to/clip.mp4
 # -> predicted intention: entering (confidence 97.31%)
+
+# live camera inference (webcam index 0; use --camera for a board or URL)
+python src/__main__.py live --camera 0 --window 3.0
+# which edge of the image the door is on (default: right); heading there = entering
+python src/__main__.py live --camera 0 --door-side top
 ```
+
+`predict` is retained as a development and regression tool. Product inference
+uses the continuous `live` camera path.
 
 See [Setup](docs/SETUP.md) and [Usage](docs/USAGE.md) for the full walkthrough.
 

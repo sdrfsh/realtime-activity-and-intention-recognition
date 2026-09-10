@@ -6,13 +6,13 @@ Everything lives directly under `src/` as plain top-level modules/packages — t
 
 ```
 src/
-  config.py            configuration: paths + hyperparameters, one dataclass per concern
+  config.py            configuration: paths + hyperparameters + scene (door side), one dataclass per concern
   domain/               plain data objects (LabeledClip, MotionImage, DatasetSplit, PredictionResult, ...)
-  data/                 all disk/video I/O + the label-map file (VideoReader, LabelRepository, LabelMapRepository, ImageLoader, ImageWriter)
+  data/                 all disk/video I/O + frame sources and the label-map file
   preprocessing/        tracking + sampling, one transformation per class
   augmentation/         image augmentation, one strategy per class
   modeling/             network construction, training, and inference
-  pipelines/            orchestrators that sequence the classes above
+  pipelines/            clip/window orchestration and continuous LiveSession
   app.py                Application: the main class — builds and runs the pipelines
   __main__.py           CLI entry point (python src/__main__.py ...)
 ```
@@ -29,14 +29,15 @@ Each class has exactly one job:
 
 | Layer | Classes | Responsibility |
 |---|---|---|
-| `preprocessing/` | `NoiseReducer`, `BackgroundSubtractor`, `MotionContourDetector` | 🎯 tracking: clean, isolate, and confirm the moving subject |
-| `preprocessing/` | `OpticalFlowEstimator`, `AdaptiveFrameSampler`, `MotionImageEncoder` | ⏱️ velocity-adaptive sampling and the recency-weighted motion image |
+| `preprocessing/` | `DoorApproachDecider` | 🚪 follow the subject's centroid across a window and decide entering/passing by from its heading toward the configured door edge |
+| `preprocessing/` | `NoiseReducer`, `BackgroundSubtractor`, `MaskCleaner`, `MotionContourDetector` | 🎯 tracking: clean, isolate, denoise the mask, and confirm the moving subject |
+| `preprocessing/` | `OpticalFlowEstimator`, `AdaptiveFrameSampler`, `MotionImageEncoder`, `MotionTrigger`, `FrameWindow` | velocity-adaptive sampling, motion state, and bounded live windows |
 | `augmentation/` | `MirrorAugmenter`, `ShiftCropAugmenter` | 🔄 training-set augmentation |
 | `modeling/` | `AlexNetBuilder`, `DatasetSplitter`, `LabelEncoder`, `ModelTrainer` | 🧮 building, splitting, and training the network |
 | `modeling/` | `NetworkInputFormatter`, `ActivityPredictor` | ⚡ preparing and running real-time inference, decoding predictions back to class names |
-| `data/` | `LabelMapRepository` | 🏷️ persists which class index means which label (e.g. `0 -> entering`), so inference can report a name, not a number |
-| `pipelines/` | `ClipPreprocessingPipeline`, `DatasetPreparationPipeline`, `TrainingPipeline`, `RealtimeInferencePipeline` | 🔗 sequence the classes above — no business logic of their own |
-| `app.py` | `Application` | 🚪 the composition root: wires concrete classes together from `Settings` and exposes `prepare_dataset()`, `train()`, `predict()` |
+| `data/` | `FrameSource`, `FileFrameSource`, `CameraFrameSource`, repositories | provide frames and persist labels/images; only `CameraFrameSource` opens camera capture |
+| `pipelines/` | `ClipPreprocessingPipeline`, `WindowClipPipeline`, `LiveSession`, dataset/training pipelines | preserve the training clip path and run the continuous camera path; `LiveSession` decides per window either by heading (`DoorApproachDecider`) or by the network (`ActivityPredictor`) |
+| `app.py` | `Application` | the composition root: wires concrete classes together from `Settings` and exposes `prepare_dataset()`, `train()`, `predict()`, `live()` |
 
 ## ⬇️ Dependency direction
 
@@ -47,3 +48,7 @@ pipelines → preprocessing / modeling / data → domain
 ```
 
 Nothing in `domain/` or `preprocessing/` imports from `pipelines/` or `app.py`.
+
+`LiveSession` owns one stateful KNN subtractor for its complete session. Its
+capture thread only reads frames into a bounded queue; the worker performs
+noise reduction, trigger/window management, motion encoding, and prediction.

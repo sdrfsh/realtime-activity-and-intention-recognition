@@ -7,8 +7,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from tensorflow.keras import Model
-from tensorflow.keras.optimizers import SGD
+from keras import Model
+from keras.optimizers import SGD
 
 from config import NetworkSettings
 

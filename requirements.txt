@@ -1,5 +1,7 @@
 numpy
 opencv-python
 pandas
-tensorflow
+keras>=3
+jax
+huggingface_hub
 pytest
