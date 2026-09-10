@@ -3,7 +3,7 @@ from modeling.label_encoder import LabelEncoder
 
 def test_encode_is_stable_and_zero_indexed():
     encoder = LabelEncoder(["run", "walk", "run", "jump"])
-    assert encoder.num_classes == 3
+    assert len(encoder.classes) == 3
     indices = {encoder.encode("jump"), encoder.encode("run"), encoder.encode("walk")}
     assert indices == {0, 1, 2}
 

@@ -5,7 +5,8 @@ Tanh's symmetric (-1, 1) range gave better class separation), Softmax output,
 and normal-Glorot kernel initialization (paired best with Tanh)."""
 from __future__ import annotations
 
-from tensorflow.keras.layers import (
+from keras import Input, Sequential
+from keras.layers import (
     Activation,
     Conv2D,
     Dense,
@@ -13,7 +14,6 @@ from tensorflow.keras.layers import (
     Flatten,
     MaxPooling2D,
 )
-from tensorflow.keras.models import Sequential
 
 from config import NetworkSettings
 
@@ -28,8 +28,9 @@ class AlexNetBuilder:
         s = self._settings
         model = Sequential(name="alexnet_activity_recognizer")
 
+        model.add(Input(shape=s.input_shape))
         model.add(Conv2D(96, kernel_size=(11, 11), strides=(4, 4), padding="valid",
-                          input_shape=s.input_shape, kernel_initializer=s.kernel_initializer))
+                          kernel_initializer=s.kernel_initializer))
         model.add(Activation(s.hidden_activation))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding="valid"))
 

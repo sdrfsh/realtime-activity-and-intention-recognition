@@ -24,6 +24,3 @@ class LabelEncoder:
         """Class names ordered by their integer index (index 0 first)."""
         return list(self._classes)
 
-    @property
-    def num_classes(self) -> int:
-        return len(self._classes)

@@ -49,7 +49,8 @@ def main(epochs: int) -> None:
 
     print("\npredicting on both clips:")
     for path, expected in ((entering_path, "entering"), (passing_path, "passing_by")):
-        result = app.predict(path)
+        # evaluate the model just trained, not the pretrained Hub default
+        result = app.predict(path, model_source=settings.paths.trained_model_path)
         if result is None:
             print(f"  {path.name}: no motion detected")
             continue

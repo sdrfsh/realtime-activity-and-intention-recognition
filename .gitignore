@@ -24,3 +24,6 @@ models/label_map.json
 
 # original thesis notebooks / docx / raw label files: kept locally, not uploaded
 legacy/
+
+# runtime logs (e.g. `python src/__main__.py live > live.log`)
+*.log

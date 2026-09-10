@@ -21,7 +21,11 @@ class BackgroundSubtractor:
         self._subtractor = self._new_subtractor()
 
     def _new_subtractor(self) -> cv2.BackgroundSubtractorKNN:
-        return cv2.createBackgroundSubtractorKNN(detectShadows=self._settings.detect_shadows)
+        return cv2.createBackgroundSubtractorKNN(
+            history=self._settings.knn_history,
+            dist2Threshold=self._settings.knn_dist2_threshold,
+            detectShadows=self._settings.detect_shadows,
+        )
 
     def reset(self) -> None:
         self._subtractor = self._new_subtractor()
