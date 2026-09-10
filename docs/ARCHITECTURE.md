@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md)
 
-Everything lives directly under `src/` as plain top-level modules/packages — there's no wrapping package name to import through:
+Everything lives directly under `src/` as plain top-level modules/packages. There's no wrapping package name to import through:
 
 ```
 src/
@@ -13,7 +13,7 @@ src/
   augmentation/         image augmentation, one strategy per class
   modeling/             deciding: network construction/training/inference and the heading-based door decider
   pipelines/            orchestration: clip/window pipelines, LiveSession (+ its LivePreview), dataset/training pipelines
-  app.py                Application: the main class — builds and runs the pipelines
+  app.py                Application: the main class that builds and runs the pipelines
   __main__.py           CLI entry point (python src/__main__.py ...)
 ```
 
